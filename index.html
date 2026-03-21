@@ -1,0 +1,1553 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Future Quest – اسالة المستقبل</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+html { min-height: 100%; margin: 0; padding: 0; }
+body { min-height: 100%; margin: 0; padding: 0; background: linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 30%, #1b0a2e 60%, #0a0a1a 100%) !important; font-family: 'Tajawal', Arial, sans-serif; overflow: hidden; }
+* { box-sizing: border-box; }
+.app-wrapper { height: 100%; width: 100%; overflow: auto; }
+.bg-future { background: linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 30%, #1b0a2e 60%, #0a0a1a 100%); position: relative; }
+.bg-future::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(0, 255, 200, 0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(120, 0, 255, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(0, 150, 255, 0.04) 0%, transparent 50%); pointer-events: none; }
+.stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; animation: twinkle var(--dur) ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+.map-node { position: absolute; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; z-index: 10; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; }
+.map-node.locked { background: rgba(30, 30, 60, 0.8); border: 2px solid rgba(100, 100, 140, 0.3); color: rgba(100, 100, 140, 0.4); cursor: not-allowed; }
+.map-node.current { background: radial-gradient(circle, rgba(0, 255, 200, 0.3), rgba(0, 255, 200, 0.1)); border: 2px solid #00ffc8; color: #00ffc8; box-shadow: 0 0 20px rgba(0, 255, 200, 0.4), 0 0 40px rgba(0, 255, 200, 0.15); animation: pulse-glow 2s ease-in-out infinite; }
+.map-node.completed { background: radial-gradient(circle, rgba(0, 200, 150, 0.25), rgba(0, 200, 150, 0.08)); border: 2px solid rgba(0, 200, 150, 0.6); color: rgba(0, 200, 150, 0.8); }
+.map-node.final-gate { width: 64px; height: 64px; font-size: 11px; }
+.map-node.final-gate.current { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.2); }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 200, 0.4), 0 0 40px rgba(0, 255, 200, 0.15); } 50% { box-shadow: 0 0 30px rgba(0, 255, 200, 0.6), 0 0 60px rgba(0, 255, 200, 0.25); } }
+.path-line { stroke: rgba(100, 100, 140, 0.2); stroke-width: 2; fill: none; }
+.path-line-active { stroke: rgba(0, 255, 200, 0.4); stroke-width: 2; fill: none; filter: drop-shadow(0 0 4px rgba(0, 255, 200, 0.3)); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.modal-overlay.active { opacity: 1; pointer-events: all; }
+.modal-content { background: linear-gradient(145deg, #0d1b2a, #1a1a3e); border: 1px solid rgba(0, 255, 200, 0.2); border-radius: 20px; padding: 32px; max-width: 520px; width: 90%; max-height: 85%; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 0 60px rgba(0, 255, 200, 0.1); }
+.modal-overlay.active .modal-content { transform: scale(1); }
+.option-btn { width: 100%; padding: 14px 20px; border-radius: 12px; background: rgba(20, 20, 50, 0.8); border: 1px solid rgba(100, 100, 160, 0.3); color: #c8c8e0; font-family: 'Tajawal', sans-serif; font-size: 16px; cursor: pointer; transition: all 0.2s ease; text-align: right; }
+.option-btn:hover { border-color: rgba(0, 255, 200, 0.5); background: rgba(0, 255, 200, 0.08); color: #e0e0ff; }
+.option-btn.correct { border-color: #00ffc8; background: rgba(0, 255, 200, 0.15); color: #00ffc8; }
+.option-btn.wrong { border-color: #ff4466; background: rgba(255, 68, 102, 0.15); color: #ff4466; }
+.memory-card { width: 64px; height: 64px; border-radius: 12px; background: rgba(20, 20, 50, 0.9); border: 1px solid rgba(100, 100, 160, 0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+.memory-card.flipped { background: rgba(0, 255, 200, 0.1); border-color: rgba(0, 255, 200, 0.4); }
+.memory-card.matched { background: rgba(0, 200, 150, 0.2); border-color: rgba(0, 200, 150, 0.6); pointer-events: none; }
+.seq-btn { width: 56px; height: 56px; border-radius: 12px; font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; border: 1px solid rgba(100, 100, 160, 0.3); background: rgba(20, 20, 50, 0.8); color: #c8c8e0; }
+.seq-btn:hover { border-color: rgba(0, 255, 200, 0.5); background: rgba(0, 255, 200, 0.08); }
+.seq-btn.highlight { background: rgba(0, 255, 200, 0.3); border-color: #00ffc8; color: #00ffc8; }
+.progress-track { height: 6px; background: rgba(30, 30, 60, 0.8); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #00ffc8, #00aaff); border-radius: 3px; transition: width 0.5s ease; }
+.badge-easy { color: #00ffc8; border-color: rgba(0, 255, 200, 0.4); }
+.badge-medium { color: #ffaa00; border-color: rgba(255, 170, 0, 0.4); }
+.badge-hard { color: #ff4466; border-color: rgba(255, 68, 102, 0.4); }
+.toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 200; pointer-events: none; }
+.toast { padding: 12px 24px; border-radius: 12px; font-family: 'Tajawal', sans-serif; font-size: 15px; font-weight: 700; opacity: 0; transform: translateY(-20px); transition: all 0.4s ease; pointer-events: none; text-align: center; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: rgba(0, 255, 200, 0.15); border: 1px solid rgba(0, 255, 200, 0.4); color: #00ffc8; }
+.toast.error { background: rgba(255, 68, 102, 0.15); border: 1px solid rgba(255, 68, 102, 0.4); color: #ff4466; }
+.celebration-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 300; display: flex; align-items: center; justify-content: center; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+.celebration-overlay.active { opacity: 1; pointer-events: all; }
+@keyframes float-up { 0% { transform: translateY(100%) rotate(0deg); opacity: 1; } 100% { transform: translateY(-200%) rotate(720deg); opacity: 0; } }
+.particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; animation: float-up var(--dur) ease-out forwards; }
+.timer-bar { height: 4px; background: rgba(30, 30, 60, 0.8); border-radius: 2px; overflow: hidden; margin-top: 12px; }
+.timer-fill { height: 100%; background: linear-gradient(90deg, #ff4466, #ffaa00, #00ffc8); border-radius: 2px; transition: width 0.1s linear; }
+.reaction-target { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #00ffc8, #008866); cursor: pointer; position: absolute; transition: transform 0.1s ease; box-shadow: 0 0 30px rgba(0, 255, 200, 0.5); }
+.reaction-target:hover { transform: scale(1.1); }
+.pattern-cell { width: 48px; height: 48px; border-radius: 8px; border: 1px solid rgba(100, 100, 160, 0.3); background: rgba(20, 20, 50, 0.8); cursor: pointer; transition: all 0.2s ease; }
+.pattern-cell.active { background: rgba(0, 255, 200, 0.3); border-color: #00ffc8; }
+.pattern-cell.show { background: rgba(0, 255, 200, 0.4); border-color: #00ffc8; }
+.app-wrapper::-webkit-scrollbar { width: 6px; }
+.app-wrapper::-webkit-scrollbar-track { background: transparent; }
+.app-wrapper::-webkit-scrollbar-thumb { background: rgba(0, 255, 200, 0.2); border-radius: 3px; }
+.map-scroll::-webkit-scrollbar { width: 4px; }
+.map-scroll::-webkit-scrollbar-track { background: transparent; }
+.map-scroll::-webkit-scrollbar-thumb { background: rgba(0, 255, 200, 0.15); border-radius: 2px; }
+.letter-box { width: 44px; height: 52px; border-radius: 10px; background: rgba(20, 20, 50, 0.9); border: 2px solid rgba(100, 100, 160, 0.3); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 700; color: #c8c8e0; transition: all 0.2s ease; }
+.letter-box.filled { border-color: rgba(0, 255, 200, 0.5); color: #00ffc8; }
+.letter-box.correct-letter { border-color: #00ffc8; background: rgba(0, 255, 200, 0.15); color: #00ffc8; }
+</style>
+ </head>
+ <body class="bg-future">
+  <div class="app-wrapper" id="app">
+   <!-- Stars background -->
+   <div class="stars" id="stars"></div><!-- Toast -->
+   <div class="toast-container">
+    <div class="toast" id="toast"></div>
+   </div><!-- Header -->
+   <header class="relative z-10 p-4 flex items-center justify-between" style="border-bottom: 1px solid rgba(0,255,200,0.1);">
+    <div class="flex items-center gap-3">
+     <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(0,255,200,0.1); border: 1px solid rgba(0,255,200,0.3);">
+      <i data-lucide="rocket" style="width:20px;height:20px;color:#00ffc8;"></i>
+     </div>
+     <div>
+      <h1 id="gameTitle" class="text-lg font-bold" style="font-family:'Orbitron',sans-serif;color:#00ffc8;">Future Quest</h1>
+      <p id="companyName" class="text-xs" style="color:rgba(0,255,200,0.5);">The Future</p>
+      <p id="userInfo" class="text-xs" style="color:rgba(0,255,200,0.8);">غير مسجل • الرجاء تسجيل الدخول</p>
+     </div>
+    </div>
+    <div class="flex items-center gap-4">
+     <div class="text-center">
+      <p class="text-xs" style="color:rgba(200,200,224,0.5);">المستوى</p>
+      <p id="levelDisplay" class="text-sm font-bold" style="font-family:'Orbitron',sans-serif;color:#00ffc8;">1/30</p>
+     </div>
+     <div class="text-center">
+      <p class="text-xs" style="color:rgba(200,200,224,0.5);">النجوم ⭐</p>
+      <p id="starsDisplay" class="text-sm font-bold" style="font-family:'Orbitron',sans-serif;color:#ffd700;">0</p>
+     </div>
+     <button id="logoutBtn" class="p-2 rounded-lg" style="background:rgba(0,170,255,0.1);border:1px solid rgba(0,170,255,0.3);" title="تسجيل الخروج"> <i data-lucide="log-out" style="width:16px;height:16px;color:#00aaff;"></i> </button>
+     <button id="resetBtn" class="p-2 rounded-lg" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);" title="إعادة البدء"> <i data-lucide="rotate-ccw" style="width:16px;height:16px;color:#ff4466;"></i> </button>
+    </div>
+   </header><!-- Progress -->
+   <div class="relative z-10 px-4 py-2">
+    <div class="progress-track">
+     <div class="progress-fill" id="progressBar" style="width:0%"></div>
+    </div>
+   </div><!-- Map View -->
+   <div id="mapView" class="relative z-10 map-scroll" style="height:calc(100% - 110px);overflow-y:auto;overflow-x:hidden;padding:20px;">
+    <svg id="pathSvg" style="position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:1;"></svg>
+    <div id="mapContainer" style="position:relative;width:100%;min-height:1600px;"></div>
+   </div><!-- Challenge Modal -->
+   <div class="modal-overlay" id="challengeModal">
+    <div class="modal-content" id="challengeContent"></div>
+   </div><!-- Auth Modal -->
+   <div class="modal-overlay" id="authModal">
+    <div class="modal-content" style="max-width:420px;">
+     <h2 class="text-2xl font-bold mb-4" style="color:#00ffc8;font-family:'Orbitron',sans-serif;">تسجيل الدخول / التسجيل</h2>
+     <div class="flex gap-2 mb-4 justify-center">
+      <button id="authLoginTab" class="px-4 py-2 rounded-lg" style="background:rgba(0,255,200,0.15);border:1px solid rgba(0,255,200,0.3);color:#00ffc8;">دخول</button>
+      <button id="authRegisterTab" class="px-4 py-2 rounded-lg" style="background:rgba(100,100,160,0.2);border:1px solid rgba(100,100,160,0.4);color:#c8c8e0;">تسجيل</button>
+     </div>
+     <div id="authFormArea"></div>
+     <p id="authMessage" class="text-sm mt-3" style="color:#ff4466;min-height:20px;"></p>
+     <div class="flex justify-end gap-3 mt-4">
+      <button id="authCancel" class="px-4 py-2 rounded-lg font-bold" style="background:rgba(100,100,160,0.2);border:1px solid rgba(100,100,160,0.4);color:#c8c8e0;">إلغاء</button>
+      <button id="authSubmit" class="px-4 py-2 rounded-lg font-bold" style="background:linear-gradient(90deg,#00ffc8,#00aaff);color:#0a0a1a;">تنفيذ</button>
+     </div>
+    </div>
+   </div><!-- Celebration -->
+   <div class="celebration-overlay" id="celebration">
+    <div class="text-center" style="z-index:10;">
+     <div class="text-6xl mb-6">
+      🎉
+     </div>
+     <h2 class="text-3xl font-black mb-3" style="font-family:'Orbitron',sans-serif;color:#ffd700;">مبروك!</h2>
+     <p class="text-xl mb-2" style="color:#00ffc8;">وصلت للمستقبل!</p>
+     <p class="text-sm mb-6" style="color:rgba(200,200,224,0.6);" id="finalStars">النجوم: 0/90</p><button id="celebrationRestart" class="px-8 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#00ffc8,#00aaff);color:#0a0a1a;font-family:'Tajawal',sans-serif;font-size:16px;border:none;cursor:pointer;"> العب مرة أخرى </button>
+    </div>
+   </div><!-- Reset Confirmation -->
+   <div class="modal-overlay" id="resetModal">
+    <div class="modal-content" style="max-width:360px;text-align:center;">
+     <div class="text-4xl mb-4">
+      ⚠️
+     </div>
+     <h3 class="text-xl font-bold mb-3" style="color:#ff4466;">إعادة تعيين اللعبة</h3>
+     <p class="mb-6" style="color:rgba(200,200,224,0.7);">إعادة تعيين اللعبة؟ سيتم حذف كل التقدم.</p>
+     <div class="flex gap-3 justify-center">
+      <button id="confirmReset" class="px-6 py-2 rounded-xl font-bold" style="background:rgba(255,68,102,0.2);border:1px solid rgba(255,68,102,0.5);color:#ff4466;cursor:pointer;">نعم، أعد تعيين</button> <button id="cancelReset" class="px-6 py-2 rounded-xl font-bold" style="background:rgba(100,100,160,0.2);border:1px solid rgba(100,100,160,0.3);color:#c8c8e0;cursor:pointer;">إلغاء</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+// ===== GAME STATE =====
+let currentLevel = 1;
+let totalStars = 0;
+let levelStars = {};
+let challengeTimer = null;
+
+// ===== CONFIG =====
+const defaultConfig = {
+  game_title: 'Future Quest',
+  company_name: 'The Silent Future',
+  background_color: '#0a0a1a',
+  surface_color: '#0d1b2a',
+  text_color: '#c8c8e0',
+  primary_action_color: '#00ffc8',
+  secondary_action_color: '#ffaa00',
+  font_family: 'Tajawal',
+  font_size: 16
+};
+
+// ===== CHALLENGES DATA =====
+const challenges = [
+  { id:1, type:'quiz', icon:'🧠', cat:'ذكاء', q:'أي كوكب أقرب إلى الشمس؟', opts:['الأرض','المريخ','عطارد','الزهرة'], ans:2, time:15 },
+  { id:2, type:'quiz', icon:'⚡', cat:'سرعة', q:'كم يوماً في السنة الكبيسة؟', opts:['365','366','364','367'], ans:1, time:12 },
+  { id:3, type:'quiz', icon:'🧠', cat:'ذكاء', q:'ما هو العنصر الكيميائي O؟', opts:['ذهب','أكسجين','حديد','فضة'], ans:1, time:15 },
+  { id:4, type:'reaction', icon:'🎯', cat:'سرعة', q:'اضغط على الدائرة بأسرع ما يمكن!', targets:3, time:8 },
+  { id:5, type:'quiz', icon:'🔢', cat:'منطق', q:'ما هو 15 × 4؟', opts:['45','60','55','50'], ans:1, time:12 },
+  { id:6, type:'memory_pairs', icon:'🃏', cat:'ذاكرة', q:'جد الأزواج المتطابقة!', pairsCount:5, time:25 },
+  { id:7, type:'quiz', icon:'🧠', cat:'ذكاء', q:'أي حيوان يُعرف بأنه ملك الغابة؟', opts:['نمر','أسد','فيل','دب'], ans:1, time:12 },
+  { id:8, type:'quiz', icon:'⚡', cat:'سرعة', q:'ما لون السماء في يوم صافٍ؟', opts:['أخضر','أزرق','أحمر','أصفر'], ans:1, time:8 },
+  { id:9, type:'pattern', icon:'🔲', cat:'ذاكرة', q:'تذكر النمط ثم أعد رسمه', gridSize:3, patternCount:3, time:20 },
+  { id:10, type:'quiz', icon:'🔢', cat:'منطق', q:'أكمل: 2، 4، 8، 16، ___', opts:['20','24','32','30'], ans:2, time:12 },
+  // MEDIUM 11-20
+  { id:11, type:'quiz', icon:'🧠', cat:'ذكاء', q:'ما هي عاصمة اليابان؟', opts:['بكين','سيول','طوكيو','بانكوك'], ans:2, time:10 },
+  { id:12, type:'memory_pairs', icon:'🃏', cat:'ذاكرة', q:'جد الأزواج المتطابقة!', pairsCount:5, time:25 },
+  { id:13, type:'math', icon:'🔢', cat:'منطق', q:'احسب بسرعة', num1:0, num2:0, op:'+', time:10 },
+  { id:14, type:'reaction', icon:'🎯', cat:'سرعة', q:'اضغط على 5 أهداف!', targets:5, time:10 },
+  { id:15, type:'word_scramble', icon:'📝', cat:'ذكاء', q:'أعد ترتيب الحروف لتشكيل كلمة', word:'كمبيوتر', time:20 },
+  { id:16, type:'pattern', icon:'🔲', cat:'ذاكرة', q:'نمط أكبر هذه المرة!', gridSize:4, patternCount:4, time:20 },
+  { id:17, type:'quiz', icon:'🧠', cat:'ذكاء', q:'كم عدد القارات؟', opts:['5','6','7','8'], ans:2, time:10 },
+  { id:18, type:'math', icon:'🔢', cat:'منطق', q:'تحدي رياضي متوسط', num1:0, num2:0, op:'×', time:12 },
+  { id:19, type:'memory_grid', icon:'🎨', cat:'ذاكرة', q:'تذكر الألوان!', gridSize:4, colorsCount:6, time:30 },
+  { id:20, type:'quiz', icon:'⚡', cat:'سرعة', q:'أي كوكب يُعرف بالكوكب الأحمر؟', opts:['الزهرة','المشتري','المريخ','زحل'], ans:2, time:8 },
+  // HARD 21-30
+  { id:21, type:'math', icon:'🔢', cat:'منطق', q:'تحدي رياضي معقد', num1:0, num2:0, op:'×', time:10 },
+  { id:22, type:'image_memory', icon:'🎨', cat:'ذاكرة', q:'تذكر الصور!', imagesCount:4, time:30 },
+  { id:23, type:'pattern', icon:'🔲', cat:'ذاكرة', q:'نمط معقد 5×5!', gridSize:5, patternCount:6, time:20 },
+  { id:24, type:'reaction', icon:'🎯', cat:'سرعة', q:'اضغط على 7 أهداف بسرعة!', targets:7, time:10 },
+  { id:25, type:'word_scramble', icon:'📝', cat:'ذكاء', q:'كلمة أطول هذه المرة', word:'تكنولوجيا', time:25 },
+  { id:26, type:'quiz', icon:'🧠', cat:'ذكاء', q:'ما أصغر عدد زوجي أولي؟', opts:['0','1','2','4'], ans:2, time:8 },
+  { id:27, type:'math', icon:'🔢', cat:'منطق', q:'التحدي الرياضي النهائي', num1:0, num2:0, op:'×', time:8 },
+  { id:28, type:'speed_click', icon:'⚡', cat:'سرعة', q:'اضغط أكثر ما يمكن!', duration:10, time:10 },
+  { id:29, type:'pattern', icon:'🔲', cat:'ذاكرة', q:'نمط 5×5 بـ 8 خلايا!', gridSize:5, patternCount:8, time:20 },
+  { id:30, type:'future_vision', icon:'🚀', cat:'المستقبل', q:'اختر رؤيتك للمستقبل', vision1:'تكنولوجيا متقدمة تغير العالم', vision2:'إنسانية مليئة بالتعاون والحب', vision3:'اكتشافات علمية لا نهائية', vision4:'عالم مستدام وأخضر', time:30 }
+];
+
+// ===== STAR BACKGROUND =====
+function createStars() {
+  const c = document.getElementById('stars');
+  c.innerHTML = '';
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+    s.style.animationDelay = Math.random() * 3 + 's';
+    c.appendChild(s);
+  }
+}
+
+// ===== AUTH & LOAD/SAVE =====
+let currentUser = null;
+let authMode = 'login';
+
+function getAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem('fq_accounts') || '{}');
+  } catch(e) {
+    return {};
+  }
+}
+
+function setAccounts(accounts) {
+  localStorage.setItem('fq_accounts', JSON.stringify(accounts));
+}
+
+function getUserKey(user) {
+  return `fq_saved_${user}`;
+}
+
+function loadProgress() {
+  if (!currentUser) return;
+  try {
+    const d = localStorage.getItem(getUserKey(currentUser));
+    if (d) {
+      const p = JSON.parse(d);
+      currentLevel = Math.min(p.currentLevel || 1, 31);
+      totalStars = p.totalStars || 0;
+      levelStars = p.levelStars || {};
+      return;
+    }
+  } catch(e) {}
+
+  // Default starter progress
+  currentLevel = 1;
+  totalStars = 0;
+  levelStars = {};
+}
+
+function saveProgress() {
+  if (!currentUser) return;
+  try {
+    localStorage.setItem(getUserKey(currentUser), JSON.stringify({ currentLevel, totalStars, levelStars }));
+  } catch(e) {}
+}
+
+function saveCurrentUser() {
+  if (currentUser) localStorage.setItem('fq_user', currentUser);
+  else localStorage.removeItem('fq_user');
+}
+
+function initAuth() {
+  const stored = localStorage.getItem('fq_user');
+  if (stored) {
+    const accounts = getAccounts();
+    if (accounts[stored]) {
+      currentUser = stored;
+      setAuthStatus();
+      loadProgress();
+      continueToGame();
+      return;
+    }
+  }
+  openAuthModal('login');
+}
+
+function setAuthStatus() {
+  const userInfo = document.getElementById('userInfo');
+  if (currentUser) {
+    userInfo.textContent = `مرحباً، ${currentUser}`;
+    document.getElementById('logoutBtn').style.display = 'inline-flex';
+  } else {
+    userInfo.textContent = 'غير مسجل • الرجاء تسجيل الدخول';
+    document.getElementById('logoutBtn').style.display = 'none';
+  }
+}
+
+function openAuthModal(mode = 'login') {
+  authMode = mode;
+  const authModal = document.getElementById('authModal');
+  const openBtn = document.getElementById('authSubmit');
+  const msg = document.getElementById('authMessage');
+  authModal.classList.add('active');
+  document.getElementById('authLoginTab').style.background = mode === 'login' ? 'rgba(0,255,200,0.15)' : 'rgba(100,100,160,0.2)';
+  document.getElementById('authRegisterTab').style.background = mode === 'register' ? 'rgba(0,255,200,0.15)' : 'rgba(100,100,160,0.2)';
+  msg.textContent = '';
+  renderAuthForm();
+  openBtn.textContent = mode === 'login' ? 'دخول' : 'تسجيل';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('active');
+}
+
+function renderAuthForm() {
+  const area = document.getElementById('authFormArea');
+  area.innerHTML = `
+    <label class="block text-right mb-2" style="color:#c8c8e0;">اسم المستخدم</label>
+    <input id="authUsername" class="w-full p-3 rounded-lg" style="background:rgba(20,20,50,0.9);border:1px solid rgba(100,100,160,0.3);color:#c8c8e0;" />
+    <label class="block text-right mt-3 mb-2" style="color:#c8c8e0;">كلمة المرور</label>
+    <input id="authPassword" type="password" class="w-full p-3 rounded-lg" style="background:rgba(20,20,50,0.9);border:1px solid rgba(100,100,160,0.3);color:#c8c8e0;" />
+  `;
+}
+
+function loginUser() {
+  const user = document.getElementById('authUsername').value.trim();
+  const pass = document.getElementById('authPassword').value;
+  const msg = document.getElementById('authMessage');
+  if (!user || !pass) { msg.textContent = 'يرجى ملء الحقلين'; return; }
+  const accounts = getAccounts();
+  if (!accounts[user] || accounts[user].password !== pass) { msg.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة'; return; }
+  currentUser = user;
+  saveCurrentUser();
+  setAuthStatus();
+  loadProgress();
+  closeAuthModal();
+  continueToGame();
+  showToast('تم تسجيل الدخول بنجاح', 'success');
+}
+
+function registerUser() {
+  const user = document.getElementById('authUsername').value.trim();
+  const pass = document.getElementById('authPassword').value;
+  const msg = document.getElementById('authMessage');
+  if (!user || !pass) { msg.textContent = 'يرجى ملء الحقلين'; return; }
+  const accounts = getAccounts();
+  if (accounts[user]) { msg.textContent = 'اسم المستخدم موجود بالفعل'; return; }
+  accounts[user] = { password: pass };
+  setAccounts(accounts);
+  currentUser = user;
+  saveCurrentUser();
+  setAuthStatus();
+  currentLevel = 1;
+  totalStars = 0;
+  levelStars = {};
+  saveProgress();
+  closeAuthModal();
+  continueToGame();
+  showToast('تم إنشاء الحساب وتسجيل الدخول', 'success');
+}
+
+function logoutUser() {
+  currentUser = null;
+  saveCurrentUser();
+  setAuthStatus();
+  openAuthModal('login');
+}
+
+function continueToGame() {
+  renderMap();
+  if (currentLevel > 30) {
+    showCelebration();
+  }
+  setTimeout(() => scrollToCurrentLevel(), 300);
+}
+
+// ===== MAP GENERATION =====
+function generateNodePositions() {
+  const positions = [];
+  const rows = 10;
+  const nodesPerRow = 3;
+  const yStart = 60;
+  const ySpacing = 150;
+  
+  for (let r = 0; r < rows; r++) {
+    for (let n = 0; n < nodesPerRow; n++) {
+      const idx = r * nodesPerRow + n;
+      if (idx >= 30) break;
+      const xBase = (n + 1) / (nodesPerRow + 1) * 100;
+      const xOffset = (r % 2 === 0 ? 1 : -1) * (n === 1 ? 0 : 5);
+      positions.push({
+        x: xBase + xOffset,
+        y: yStart + r * ySpacing
+      });
+    }
+  }
+  return positions;
+}
+
+function renderMap() {
+  const container = document.getElementById('mapContainer');
+  const svg = document.getElementById('pathSvg');
+  const positions = generateNodePositions();
+  
+  // Set container height
+  const maxY = Math.max(...positions.map(p => p.y));
+  container.style.minHeight = (maxY + 120) + 'px';
+  svg.style.height = (maxY + 120) + 'px';
+  
+  // Clear
+  container.innerHTML = '';
+  svg.innerHTML = '';
+  
+  // Draw paths
+  for (let i = 0; i < positions.length - 1; i++) {
+    const from = positions[i];
+    const to = positions[i + 1];
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', from.x + '%');
+    line.setAttribute('y1', from.y);
+    line.setAttribute('x2', to.x + '%');
+    line.setAttribute('y2', to.y);
+    line.setAttribute('class', i < currentLevel - 1 ? 'path-line-active' : 'path-line');
+    svg.appendChild(line);
+  }
+  
+  // Draw nodes
+  positions.forEach((pos, idx) => {
+    const lvl = idx + 1;
+    const ch = challenges[idx];
+    const node = document.createElement('div');
+    const isFinal = lvl === 30;
+    
+    let stateClass = 'locked';
+    if (lvl < currentLevel) stateClass = 'completed';
+    else if (lvl === currentLevel) stateClass = 'current';
+    
+    node.className = `map-node ${stateClass} ${isFinal ? 'final-gate' : ''}`;
+    node.style.left = `calc(${pos.x}% - ${isFinal ? 32 : 24}px)`;
+    node.style.top = pos.y + 'px';
+    
+    if (stateClass === 'completed') {
+      node.innerHTML = `<span style="font-size:18px;">✓</span>`;
+    } else if (isFinal && stateClass !== 'locked') {
+      node.innerHTML = `<span style="font-size:20px;">🚀</span>`;
+    } else if (isFinal) {
+      node.innerHTML = `<span style="font-size:16px;opacity:0.3;">🔒</span>`;
+    } else {
+      node.innerHTML = `<span>${ch.icon}</span>`;
+    }
+    
+    // Tooltip
+    const diffLabel = lvl <= 10 ? 'سهل' : lvl <= 20 ? 'متوسط' : 'صعب';
+    const diffClass = lvl <= 10 ? 'badge-easy' : lvl <= 20 ? 'badge-medium' : 'badge-hard';
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'absolute text-center pointer-events-none';
+    tooltip.style.cssText = 'bottom:-32px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;';
+    
+    const starStr = levelStars[lvl] ? '⭐'.repeat(levelStars[lvl]) : '';
+    tooltip.innerHTML = `<span class="${diffClass}" style="font-weight:600;">${ch.cat}</span>${starStr ? '<br>' + starStr : ''}`;
+    node.appendChild(tooltip);
+    
+    if (stateClass !== 'locked') {
+      node.addEventListener('click', (e) => {
+        if (isMapDragging) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        openChallenge(lvl);
+      });
+    }
+    
+    container.appendChild(node);
+  });
+  
+  // Update header
+  document.getElementById('levelDisplay').textContent = `${currentLevel}/30`;
+  document.getElementById('starsDisplay').textContent = `⭐ ${totalStars}`;
+  document.getElementById('progressBar').style.width = `${((currentLevel - 1) / 30) * 100}%`;
+}
+
+// ===== TOAST =====
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== CHALLENGE SYSTEM =====
+function openChallenge(lvl) {
+  const ch = challenges[lvl - 1];
+  const modal = document.getElementById('challengeModal');
+  const content = document.getElementById('challengeContent');
+  
+  const diffLabel = lvl <= 10 ? 'سهل' : lvl <= 20 ? 'متوسط' : 'صعب';
+  const diffColor = lvl <= 10 ? '#00ffc8' : lvl <= 20 ? '#ffaa00' : '#ff4466';
+  
+  let html = `
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">${ch.icon}</span>
+        <div>
+          <h3 class="font-bold text-lg" style="color:#e0e0ff;">المستوى ${lvl}</h3>
+          <span class="text-xs font-bold px-2 py-1 rounded-full" style="color:${diffColor};background:${diffColor}15;border:1px solid ${diffColor}40;">${diffLabel} - ${ch.cat}</span>
+        </div>
+      </div>
+      <button onclick="closeModal()" class="p-2 rounded-lg" style="background:rgba(100,100,160,0.2);border:1px solid rgba(100,100,160,0.3);cursor:pointer;">
+        <i data-lucide="x" style="width:18px;height:18px;color:#c8c8e0;"></i>
+      </button>
+    </div>
+    <p class="mb-4 text-base" style="color:rgba(200,200,224,0.8);">${ch.q}</p>
+  `;
+  
+  switch(ch.type) {
+    case 'quiz': html += renderQuiz(ch, lvl); break;
+    case 'reaction': html += renderReaction(ch, lvl); break;
+    case 'image_memory': html += renderImageMemory(ch, lvl); break;
+    case 'memory_pairs': html += renderMemoryPairs(ch, lvl); break;
+    case 'memory_grid': html += renderMemoryGrid(ch, lvl); break;
+    case 'pattern': html += renderPattern(ch, lvl); break;
+    case 'math': html += renderMath(ch, lvl); break;
+    case 'speed_click': html += renderSpeedClick(ch, lvl); break;
+    case 'word_scramble': html += renderWordScramble(ch, lvl); break;
+    case 'future_vision': html += renderFutureVision(ch, lvl); break;
+  }
+  
+  content.innerHTML = html;
+  modal.classList.add('active');
+  lucide.createIcons();
+  
+  // Initialize challenge-specific logic
+  setTimeout(() => {
+    switch(ch.type) {
+      case 'reaction': initReaction(ch, lvl); break;
+      case 'image_memory': initImageMemory(ch, lvl); break;
+      case 'memory_pairs': initMemoryPairs(ch, lvl); break;
+      case 'memory_grid': initMemoryGrid(ch, lvl); break;
+      case 'pattern': initPattern(ch, lvl); break;
+      case 'math': initMath(ch, lvl); break;
+      case 'speed_click': initSpeedClick(ch, lvl); break;
+      case 'word_scramble': initWordScramble(ch, lvl); break;
+      case 'future_vision': initFutureVision(ch, lvl); break;
+    }
+  }, 100);
+}
+
+function closeModal() {
+  document.getElementById('challengeModal').classList.remove('active');
+  if (challengeTimer) { clearInterval(challengeTimer); challengeTimer = null; }
+}
+
+function completeLevel(lvl, stars) {
+  const prevStars = levelStars[lvl] || 0;
+  const actualStars = Math.max(prevStars, stars);
+  const starDiff = actualStars - prevStars;
+  
+  levelStars[lvl] = actualStars;
+  totalStars += starDiff;
+  
+  if (lvl === currentLevel && currentLevel <= 30) {
+    currentLevel = Math.min(currentLevel + 1, 31);
+  }
+  
+  saveProgress();
+  
+  setTimeout(() => {
+    closeModal();
+    if (currentLevel === 31) {
+      showCelebration();
+    } else {
+      showToast(`أحسنت! حصلت على ${'⭐'.repeat(stars)}`, 'success');
+      renderMap();
+      // Scroll to current level
+      setTimeout(() => scrollToCurrentLevel(), 300);
+    }
+  }, 1200);
+}
+
+function failLevel(lvl) {
+  setTimeout(() => {
+    showToast('حاول مرة أخرى!', 'error');
+    closeModal();
+  }, 800);
+}
+
+function scrollToCurrentLevel() {
+  const currentNodes = document.querySelectorAll('.map-node.current');
+  if (currentNodes.length > 0) {
+    currentNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    // If no current, scroll to the last completed
+    const completedNodes = document.querySelectorAll('.map-node.completed');
+    if (completedNodes.length > 0) {
+      completedNodes[completedNodes.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}
+
+// ===== QUIZ =====
+function renderQuiz(ch, lvl) {
+  let h = '<div class="flex flex-col gap-3" id="quizOptions">';
+  ch.opts.forEach((opt, i) => {
+    h += `<button class="option-btn" data-idx="${i}" onclick="checkQuiz(${lvl},${i},${ch.ans})">${opt}</button>`;
+  });
+  h += '</div>';
+  h += `<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>`;
+  return h;
+}
+
+function checkQuiz(lvl, selected, correct) {
+  const btns = document.querySelectorAll('#quizOptions .option-btn');
+  btns.forEach(b => {
+    b.style.pointerEvents = 'none';
+    const idx = parseInt(b.dataset.idx);
+    if (idx === correct) b.classList.add('correct');
+    if (idx === selected && idx !== correct) b.classList.add('wrong');
+  });
+  
+  if (selected === correct) {
+    completeLevel(lvl, 3);
+  } else {
+    failLevel(lvl);
+  }
+}
+
+// ===== REACTION =====
+function renderReaction(ch, lvl) {
+  return `
+    <div id="reactionArea" style="position:relative;height:250px;border-radius:16px;background:rgba(10,10,30,0.5);border:1px solid rgba(100,100,160,0.2);overflow:hidden;">
+      <div id="reactionStart" class="flex items-center justify-center h-full cursor-pointer" onclick="startReaction(${lvl})">
+        <p class="text-lg font-bold" style="color:#00ffc8;">اضغط للبدء</p>
+      </div>
+    </div>
+    <div class="flex justify-between mt-3">
+      <span style="color:rgba(200,200,224,0.5);font-size:13px;">الأهداف: <span id="reactionCount">0</span>/${ch.targets}</span>
+      <span style="color:rgba(200,200,224,0.5);font-size:13px;">الوقت: <span id="reactionTime">${ch.time}</span>ث</span>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let reactionData = {};
+function initReaction(ch, lvl) { reactionData = { targets: ch.targets, time: ch.time, caught: 0, lvl }; }
+
+function startReaction(lvl) {
+  const area = document.getElementById('reactionArea');
+  const startDiv = document.getElementById('reactionStart');
+  if (startDiv) startDiv.remove();
+  
+  const ch = challenges[lvl - 1];
+  reactionData = { targets: ch.targets, time: ch.time, caught: 0, lvl, startTime: Date.now() };
+  
+  spawnTarget();
+  
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    document.getElementById('reactionTime').textContent = Math.max(0, timeLeft).toFixed(1);
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+function spawnTarget() {
+  const area = document.getElementById('reactionArea');
+  if (!area) return;
+  const existing = area.querySelector('.reaction-target');
+  if (existing) existing.remove();
+  
+  const t = document.createElement('div');
+  t.className = 'reaction-target';
+  t.style.left = (10 + Math.random() * 60) + '%';
+  t.style.top = (10 + Math.random() * 50) + '%';
+  t.addEventListener('click', () => {
+    reactionData.caught++;
+    document.getElementById('reactionCount').textContent = reactionData.caught;
+    t.remove();
+    if (reactionData.caught >= reactionData.targets) {
+      clearInterval(challengeTimer);
+      const elapsed = (Date.now() - reactionData.startTime) / 1000;
+      const stars = elapsed < reactionData.time * 0.4 ? 3 : elapsed < reactionData.time * 0.7 ? 2 : 1;
+      completeLevel(reactionData.lvl, stars);
+    } else {
+      setTimeout(spawnTarget, 200 + Math.random() * 400);
+    }
+  });
+  area.appendChild(t);
+}
+
+// ===== IMAGE MEMORY =====
+function renderImageMemory(ch, lvl) {
+  const emojis = ['🌟','🎮','🚀','🎸','🍕','🎨','⚽','🐱','🌈','🎪','🎭','🎯'];
+  let cards = '<div class="flex flex-wrap gap-3 justify-center" id="imageGrid" style="max-width:280px;margin:0 auto;">';
+  
+  for (let i = 0; i < ch.imagesCount * 2; i++) {
+    cards += `<div class="memory-card" data-idx="${i}" onclick="imageFlip(${i})" style="width:72px;height:72px;"><span class="image-emoji" style="display:none;font-size:40px;">😊</span></div>`;
+  }
+  cards += '</div>';
+  
+  return `
+    <div id="imageStatus" class="text-center mb-4 font-bold" style="color:#ffaa00;">انتظر... احفظ الصور</div>
+    <div id="imageCounter" class="text-center mb-3 text-sm" style="color:rgba(200,200,224,0.7);">الأزواج المتطابقة: <span id="imageMatched">0</span>/${ch.imagesCount}</div>
+    ${cards}
+    <div class="timer-bar mt-3"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let imageMemoryData = {};
+function initImageMemory(ch, lvl) {
+  const emojis = ['🌟','🎮','🚀','🎸','🍕','🎨','⚽','🐱','🌈','🎪','🎭','🎯'];
+  const selectedEmojis = emojis.slice(0, ch.imagesCount);
+  const pairs = [...selectedEmojis, ...selectedEmojis];
+  pairs.sort(() => Math.random() - 0.5);
+  
+  imageMemoryData = {
+    pairs,
+    flipped: [],
+    matched: [],
+    lvl,
+    matchedPairs: 0,
+    totalPairs: ch.imagesCount,
+    time: ch.time
+  };
+  
+  // Set emojis on cards
+  document.querySelectorAll('#imageGrid .memory-card').forEach((card, i) => {
+    card.querySelector('.image-emoji').textContent = pairs[i];
+  });
+  
+  // Show all initially
+  document.querySelectorAll('#imageGrid .image-emoji').forEach(e => {
+    e.style.display = 'block';
+  });
+  document.querySelectorAll('#imageGrid .memory-card').forEach(c => c.style.pointerEvents = 'none');
+  
+  document.getElementById('imageStatus').textContent = 'انتظر وافحص الصور...';
+  document.getElementById('imageStatus').style.color = '#ffaa00';
+  
+  setTimeout(() => {
+    document.querySelectorAll('#imageGrid .image-emoji').forEach(e => {
+      e.style.display = 'none';
+    });
+    document.querySelectorAll('#imageGrid .memory-card').forEach(c => c.style.pointerEvents = 'auto');
+    document.getElementById('imageStatus').textContent = 'ابحث عن الأزواج المتطابقة!';
+    document.getElementById('imageStatus').style.color = '#00ffc8';
+  }, 3000);
+  
+  // Timer
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+function imageFlip(idx) {
+  if (imageMemoryData.flipped.length >= 2 || imageMemoryData.matched.includes(idx) || imageMemoryData.flipped.includes(idx)) return;
+  
+  const card = document.querySelectorAll('#imageGrid .memory-card')[idx];
+  card.classList.add('flipped');
+  card.querySelector('.image-emoji').style.display = 'block';
+  imageMemoryData.flipped.push(idx);
+  
+  if (imageMemoryData.flipped.length === 2) {
+    const [first, second] = imageMemoryData.flipped;
+    const match = imageMemoryData.pairs[first] === imageMemoryData.pairs[second];
+    
+    setTimeout(() => {
+      if (match) {
+        imageMemoryData.matched.push(first, second);
+        imageMemoryData.matchedPairs++;
+        document.getElementById('imageMatched').textContent = imageMemoryData.matchedPairs;
+        
+        if (imageMemoryData.matchedPairs === imageMemoryData.totalPairs) {
+          clearInterval(challengeTimer);
+          document.getElementById('imageStatus').textContent = 'ممتاز! وجدت كل الصور ✓';
+          document.getElementById('imageStatus').style.color = '#00ffc8';
+          completeLevel(imageMemoryData.lvl, 3);
+        }
+      } else {
+        document.querySelectorAll('#imageGrid .memory-card')[first].classList.remove('flipped');
+        document.querySelectorAll('#imageGrid .memory-card')[second].classList.remove('flipped');
+        document.querySelectorAll('#imageGrid .memory-card')[first].querySelector('.image-emoji').style.display = 'none';
+        document.querySelectorAll('#imageGrid .memory-card')[second].querySelector('.image-emoji').style.display = 'none';
+      }
+      imageMemoryData.flipped = [];
+    }, 800);
+  }
+}
+// ===== MEMORY PAIRS =====
+function renderMemoryPairs(ch, lvl) {
+  const emojis = ['🍎','🍌','🍕','🎮','🎸','🎨','🎭','🎪','🏀','⚽','🐶','🐱'];
+  let cards = '<div class="flex flex-wrap gap-3 justify-center" id="memoryGrid" style="max-width:280px;margin:0 auto;">';
+  
+  for (let i = 0; i < ch.pairsCount * 2; i++) {
+    cards += `<div class="memory-card" data-idx="${i}" onclick="flipCard(${i})"><span class="emoji" style="display:none;font-size:28px;">😊</span></div>`;
+  }
+  cards += '</div>';
+  
+  return `
+    <div id="pairsStatus" class="text-center mb-4 font-bold" style="color:#00ffc8;">ابحث عن الأزواج المتطابقة</div>
+    <div id="pairsCounter" class="text-center mb-3 text-sm" style="color:rgba(200,200,224,0.7);">الأزواج المتطابقة: <span id="matchedCount">0</span>/${ch.pairsCount}</div>
+    ${cards}
+    <div class="timer-bar mt-3"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let pairsData = {};
+function initMemoryPairs(ch, lvl) {
+  const emojis = ['🍎','🍌','🍕','🎮','🎸','🎨','🎭','🎪','🏀','⚽','🐶','🐱'];
+  const selectedEmojis = emojis.slice(0, ch.pairsCount);
+  const pairs = [...selectedEmojis, ...selectedEmojis];
+  pairs.sort(() => Math.random() - 0.5);
+  
+  pairsData = { 
+    pairs, 
+    flipped: [],
+    matched: [],
+    lvl, 
+    matchedPairs: 0,
+    totalPairs: ch.pairsCount
+  };
+  
+  // Set emojis on cards
+  document.querySelectorAll('.memory-card').forEach((card, i) => {
+    card.querySelector('.emoji').textContent = pairs[i];
+  });
+  
+  // Timer
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+function flipCard(idx) {
+  if (pairsData.flipped.length >= 2 || pairsData.matched.includes(idx) || pairsData.flipped.includes(idx)) return;
+  
+  const card = document.querySelectorAll('.memory-card')[idx];
+  card.classList.add('flipped');
+  card.querySelector('.emoji').style.display = 'block';
+  pairsData.flipped.push(idx);
+  
+  if (pairsData.flipped.length === 2) {
+    const [first, second] = pairsData.flipped;
+    const match = pairsData.pairs[first] === pairsData.pairs[second];
+    
+    setTimeout(() => {
+      if (match) {
+        pairsData.matched.push(first, second);
+        pairsData.matchedPairs++;
+        document.getElementById('matchedCount').textContent = pairsData.matchedPairs;
+        
+          if (pairsData.matchedPairs === pairsData.totalPairs) {
+          clearInterval(challengeTimer);
+          document.getElementById('pairsStatus').textContent = 'ممتاز! وجدت كل الأزواج ✓';
+          document.getElementById('pairsStatus').style.color = '#00ffc8';
+          const stars = 3;
+          completeLevel(pairsData.lvl, stars);
+        }
+      } else {
+        document.querySelectorAll('.memory-card')[first].classList.remove('flipped');
+        document.querySelectorAll('.memory-card')[second].classList.remove('flipped');
+        document.querySelectorAll('.memory-card')[first].querySelector('.emoji').style.display = 'none';
+        document.querySelectorAll('.memory-card')[second].querySelector('.emoji').style.display = 'none';
+      }
+      pairsData.flipped = [];
+    }, 800);
+  }
+}
+
+// ===== MEMORY GRID =====
+function renderMemoryGrid(ch, lvl) {
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+  let grid = `<div class="flex flex-wrap gap-2 justify-center" id="memoryGridCells" style="max-width:${ch.gridSize * 68}px;margin:0 auto;">`;
+  
+  for (let i = 0; i < ch.gridSize * ch.gridSize; i++) {
+    grid += `<div class="memory-card" style="width:56px;height:56px;background:rgba(20,20,50,0.9);" data-idx="${i}" onclick="gridClick(${i})"><span class="color-display" style="display:none;width:100%;height:100%;border-radius:12px;"></span></div>`;
+  }
+  grid += '</div>';
+  
+  return `
+    <div id="gridStatus" class="text-center mb-4 font-bold" style="color:#ffaa00;">انتظر... احفظ الألوان</div>
+    <div id="gridCounter" class="text-center mb-3 text-sm" style="color:rgba(200,200,224,0.7);">الألوان المتطابقة: <span id="gridMatched">0</span>/${ch.colorsCount}</div>
+    ${grid}
+    <div class="timer-bar mt-3"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let gridData = {};
+function initMemoryGrid(ch, lvl) {
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+  const total = ch.gridSize * ch.gridSize;
+  const positions = [];
+  
+  // Create pairs of colors
+  const selectedColors = colors.slice(0, ch.colorsCount);
+  const colorPairs = [];
+  selectedColors.forEach(c => {
+    colorPairs.push(c, c);
+  });
+  
+  // Shuffle positions
+  colorPairs.sort(() => Math.random() - 0.5);
+  
+  gridData = {
+    colors: colorPairs,
+    flipped: [],
+    matched: [],
+    lvl,
+    matchedCount: 0,
+    totalColors: ch.colorsCount,
+    gridSize: ch.gridSize
+  };
+  
+  // Set colors and hide
+  document.querySelectorAll('#memoryGridCells .memory-card').forEach((card, i) => {
+    const display = card.querySelector('.color-display');
+    display.style.background = colorPairs[i];
+  });
+  
+  // Show all briefly
+  document.querySelectorAll('#memoryGridCells .color-display').forEach(d => {
+    d.style.display = 'block';
+  });
+  
+  document.querySelectorAll('#memoryGridCells .memory-card').forEach(c => c.style.pointerEvents = 'none');
+  
+  setTimeout(() => {
+    document.querySelectorAll('#memoryGridCells .color-display').forEach(d => {
+      d.style.display = 'none';
+    });
+    document.querySelectorAll('#memoryGridCells .memory-card').forEach(c => c.style.pointerEvents = 'auto');
+    document.getElementById('gridStatus').textContent = 'أعد البحث عن الأزواج!';
+    document.getElementById('gridStatus').style.color = '#00ffc8';
+  }, 2000);
+  
+  // Timer
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+function gridClick(idx) {
+  if (gridData.flipped.length >= 2 || gridData.matched.includes(idx) || gridData.flipped.includes(idx)) return;
+  
+  const card = document.querySelectorAll('#memoryGridCells .memory-card')[idx];
+  const display = card.querySelector('.color-display');
+  display.style.display = 'block';
+  gridData.flipped.push(idx);
+  
+  if (gridData.flipped.length === 2) {
+    const [first, second] = gridData.flipped;
+    const match = gridData.colors[first] === gridData.colors[second];
+    
+    setTimeout(() => {
+      if (match) {
+        gridData.matched.push(first, second);
+        gridData.matchedCount++;
+        document.getElementById('gridMatched').textContent = gridData.matchedCount;
+        
+          if (gridData.matchedCount === gridData.totalColors) {
+          clearInterval(challengeTimer);
+          document.getElementById('gridStatus').textContent = 'ممتاز! وجدت كل الألوان ✓';
+          document.getElementById('gridStatus').style.color = '#00ffc8';
+          completeLevel(gridData.lvl, 3);
+        }
+      } else {
+        document.querySelectorAll('#memoryGridCells .memory-card')[first].querySelector('.color-display').style.display = 'none';
+        document.querySelectorAll('#memoryGridCells .memory-card')[second].querySelector('.color-display').style.display = 'none';
+      }
+      gridData.flipped = [];
+    }, 800);
+  }
+}
+
+// ===== PATTERN =====
+function renderPattern(ch, lvl) {
+  let grid = `<div class="flex flex-wrap gap-2 justify-center" id="patternGrid" style="max-width:${ch.gridSize * 56}px;margin:0 auto;">`;
+  for (let i = 0; i < ch.gridSize * ch.gridSize; i++) {
+    grid += `<div class="pattern-cell" data-idx="${i}" onclick="patternClick(${i})"></div>`;
+  }
+  grid += '</div>';
+  return `
+    <div id="patternStatus" class="text-center mb-4 font-bold" style="color:#ffaa00;">احفظ النمط...</div>
+    ${grid}
+    <div class="timer-bar mt-3"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let patternData = {};
+function initPattern(ch, lvl) {
+  const total = ch.gridSize * ch.gridSize;
+  const cells = [];
+  while (cells.length < ch.patternCount) {
+    const r = Math.floor(Math.random() * total);
+    if (!cells.includes(r)) cells.push(r);
+  }
+  patternData = { pattern: cells, input: [], lvl, phase: 'show', gridSize: ch.gridSize };
+  
+  // Show pattern
+  cells.forEach(c => {
+    document.querySelector(`.pattern-cell[data-idx="${c}"]`).classList.add('show');
+  });
+  
+  document.querySelectorAll('.pattern-cell').forEach(c => c.style.pointerEvents = 'none');
+  
+  setTimeout(() => {
+    document.querySelectorAll('.pattern-cell').forEach(c => {
+      c.classList.remove('show');
+      c.style.pointerEvents = 'auto';
+    });
+    patternData.phase = 'input';
+    document.getElementById('patternStatus').textContent = 'أعد رسم النمط!';
+    document.getElementById('patternStatus').style.color = '#00ffc8';
+  }, 2000 + ch.patternCount * 300);
+}
+
+function patternClick(idx) {
+  if (patternData.phase !== 'input') return;
+  const cell = document.querySelector(`.pattern-cell[data-idx="${idx}"]`);
+  
+  if (cell.classList.contains('active')) {
+    cell.classList.remove('active');
+    patternData.input = patternData.input.filter(i => i !== idx);
+  } else {
+    cell.classList.add('active');
+    patternData.input.push(idx);
+  }
+  
+  if (patternData.input.length === patternData.pattern.length) {
+    // Check
+    const correct = patternData.pattern.every(p => patternData.input.includes(p));
+    if (correct) {
+      document.getElementById('patternStatus').textContent = 'صحيح! ✓';
+      document.getElementById('patternStatus').style.color = '#00ffc8';
+      const stars = patternData.pattern.length >= 7 ? 3 : patternData.pattern.length >= 5 ? 2 : 1;
+      completeLevel(patternData.lvl, stars);
+    } else {
+      document.getElementById('patternStatus').textContent = 'خطأ! ✗';
+      document.getElementById('patternStatus').style.color = '#ff4466';
+      // Show correct pattern
+      patternData.pattern.forEach(c => {
+        document.querySelector(`.pattern-cell[data-idx="${c}"]`).classList.add('show');
+      });
+      failLevel(patternData.lvl);
+    }
+  }
+}
+
+// ===== SPEED CLICK =====
+function renderSpeedClick(ch, lvl) {
+  return `
+    <div id="speedClickArea" style="position:relative;height:280px;border-radius:16px;background:rgba(10,10,30,0.5);border:1px solid rgba(100,100,160,0.2);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+      <div id="speedClickStart" class="flex items-center justify-center h-full w-full cursor-pointer flex-col gap-3" onclick="startSpeedClick(${lvl})">
+        <p class="text-5xl">🎯</p>
+        <p class="text-lg font-bold" style="color:#00ffc8;">اضغط للبدء</p>
+      </div>
+    </div>
+    <div class="flex justify-between mt-3">
+      <span style="color:rgba(200,200,224,0.5);font-size:13px;">عدد الضغطات: <span id="clickCount">0</span></span>
+      <span style="color:rgba(200,200,224,0.5);font-size:13px;">الوقت: <span id="speedTime">${ch.duration}</span>ث</span>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let speedClickData = {};
+function initSpeedClick(ch, lvl) { 
+  speedClickData = { duration: ch.duration, clicks: 0, lvl, started: false }; 
+}
+
+function startSpeedClick(lvl) {
+  const area = document.getElementById('speedClickArea');
+  const startDiv = document.getElementById('speedClickStart');
+  if (startDiv) startDiv.remove();
+  
+  const ch = challenges[lvl - 1];
+  speedClickData = { duration: ch.duration, clicks: 0, lvl, started: true, startTime: Date.now() };
+  
+  // Create clickable target
+  const target = document.createElement('div');
+  target.className = 'reaction-target';
+  target.style.position = 'relative';
+  target.style.left = 'auto';
+  target.style.top = 'auto';
+  target.style.margin = '0 auto';
+  target.addEventListener('click', (e) => {
+    e.stopPropagation();
+    speedClickData.clicks++;
+    document.getElementById('clickCount').textContent = speedClickData.clicks;
+    
+    // Animate click feedback
+    target.style.transform = 'scale(0.85)';
+    setTimeout(() => { target.style.transform = 'scale(1)'; }, 100);
+  });
+  area.appendChild(target);
+  
+  let timeLeft = ch.duration;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.duration * 100) + '%';
+    document.getElementById('speedTime').textContent = Math.max(0, timeLeft).toFixed(1);
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      const stars = speedClickData.clicks >= 30 ? 3 : speedClickData.clicks >= 20 ? 2 : 1;
+      completeLevel(lvl, stars);
+    }
+  }, 100);
+}
+
+function renderMath(ch, lvl) {
+  return `
+    <div id="mathProblem" class="text-center mb-6">
+      <p class="text-4xl font-bold mb-4" style="font-family:'Orbitron',sans-serif;color:#00ffc8;" id="mathExpression">...</p>
+      <div class="flex flex-wrap gap-3 justify-center" id="mathOptions"></div>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+function initMath(ch, lvl) {
+  let a, b, op, answer;
+  const diff = lvl <= 10 ? 'easy' : lvl <= 20 ? 'medium' : 'hard';
+  
+  if (diff === 'easy') {
+    a = 5 + Math.floor(Math.random() * 20);
+    b = 2 + Math.floor(Math.random() * 15);
+    op = '+';
+    answer = a + b;
+  } else if (diff === 'medium') {
+    a = 3 + Math.floor(Math.random() * 12);
+    b = 2 + Math.floor(Math.random() * 8);
+    op = '×';
+    answer = a * b;
+  } else {
+    a = 10 + Math.floor(Math.random() * 20);
+    b = 5 + Math.floor(Math.random() * 12);
+    op = '×';
+    answer = a * b;
+  }
+  
+  document.getElementById('mathExpression').textContent = `${a} ${op} ${b} = ?`;
+  
+  // Generate options with better variety
+  const opts = [answer];
+  const range = Math.max(10, answer * 0.3);
+  while (opts.length < 4) {
+    const offset = Math.floor((Math.random() - 0.5) * range * 2);
+    const fake = answer + offset;
+    if (fake !== answer && fake > 0 && !opts.includes(fake)) opts.push(fake);
+  }
+  opts.sort(() => Math.random() - 0.5);
+  
+  const container = document.getElementById('mathOptions');
+  container.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.style.width = 'auto';
+    btn.style.minWidth = '80px';
+    btn.style.textAlign = 'center';
+    btn.style.fontFamily = "'Orbitron', sans-serif";
+    btn.textContent = o;
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.option-btn').forEach(b => {
+        b.style.pointerEvents = 'none';
+        if (parseInt(b.textContent) === answer) b.classList.add('correct');
+      });
+      if (o === answer) {
+        btn.classList.add('correct');
+        completeLevel(lvl, 3);
+      } else {
+        btn.classList.add('wrong');
+        failLevel(lvl);
+      }
+    });
+    container.appendChild(btn);
+  });
+  
+  // Timer
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+// ===== WORD SCRAMBLE =====
+function renderWordScramble(ch, lvl) {
+  return `
+    <div id="wordArea" class="text-center">
+      <div id="letterBoxes" class="flex flex-wrap gap-2 justify-center mb-6"></div>
+      <div id="scrambledLetters" class="flex flex-wrap gap-2 justify-center mb-4"></div>
+      <button id="wordClear" class="px-4 py-2 rounded-lg text-sm font-bold" style="background:rgba(255,68,102,0.15);border:1px solid rgba(255,68,102,0.3);color:#ff4466;cursor:pointer;" onclick="clearWordInput()">مسح</button>
+    </div>
+    <div class="timer-bar mt-3"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+  `;
+}
+
+let wordData = {};
+function initWordScramble(ch, lvl) {
+  const word = ch.word;
+  const letters = word.split('');
+  const scrambled = [...letters].sort(() => Math.random() - 0.5);
+  wordData = { word, input: [], scrambled, usedIndices: [], lvl };
+  
+  // Create letter boxes
+  const boxes = document.getElementById('letterBoxes');
+  boxes.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box';
+    box.id = `lb-${i}`;
+    boxes.appendChild(box);
+  }
+  
+  // Create scrambled letters
+  const sLetters = document.getElementById('scrambledLetters');
+  sLetters.innerHTML = '';
+  scrambled.forEach((l, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'seq-btn';
+    btn.style.width = '44px';
+    btn.style.height = '52px';
+    btn.style.fontSize = '20px';
+    btn.textContent = l;
+    btn.id = `sl-${i}`;
+    btn.addEventListener('click', () => selectLetter(i, l));
+    sLetters.appendChild(btn);
+  });
+  
+  // Timer
+  let timeLeft = ch.time;
+  const fill = document.getElementById('timerFill');
+  challengeTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    fill.style.width = (timeLeft / ch.time * 100) + '%';
+    if (timeLeft <= 0) {
+      clearInterval(challengeTimer);
+      failLevel(lvl);
+    }
+  }, 100);
+}
+
+function selectLetter(idx, letter) {
+  if (wordData.usedIndices.includes(idx)) return;
+  wordData.usedIndices.push(idx);
+  wordData.input.push(letter);
+  
+  const pos = wordData.input.length - 1;
+  const box = document.getElementById(`lb-${pos}`);
+  box.textContent = letter;
+  box.classList.add('filled');
+  
+  const btn = document.getElementById(`sl-${idx}`);
+  btn.style.opacity = '0.3';
+  btn.style.pointerEvents = 'none';
+  
+  if (wordData.input.length === wordData.word.length) {
+    const attempt = wordData.input.join('');
+    if (attempt === wordData.word) {
+      for (let i = 0; i < wordData.word.length; i++) {
+        document.getElementById(`lb-${i}`).classList.add('correct-letter');
+      }
+      clearInterval(challengeTimer);
+      completeLevel(wordData.lvl, 3);
+    } else {
+      for (let i = 0; i < wordData.word.length; i++) {
+        document.getElementById(`lb-${i}`).classList.add('wrong-letter');
+      }
+      clearInterval(challengeTimer);
+      failLevel(wordData.lvl);
+    }
+  }
+}
+
+function clearWordInput() {
+  wordData.input = [];
+  wordData.usedIndices = [];
+  for (let i = 0; i < wordData.word.length; i++) {
+    const box = document.getElementById(`lb-${i}`);
+    box.textContent = '';
+    box.className = 'letter-box';
+  }
+  wordData.scrambled.forEach((_, i) => {
+    const btn = document.getElementById(`sl-${i}`);
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  });
+}
+
+// ===== FUTURE VISION =====
+function renderFutureVision(ch, lvl) {
+  return `
+    <div class="space-y-3">
+      <button class="w-full p-4 rounded-lg text-left font-bold transition-all" 
+        style="background:rgba(0,255,200,0.1);border:2px solid rgba(0,255,200,0.3);color:#00ffc8;"
+        onmouseover="this.style.borderColor='#00ffc8';this.style.background='rgba(0,255,200,0.15';"
+        onmouseout="this.style.borderColor='rgba(0,255,200,0.3)';this.style.background='rgba(0,255,200,0.1';"
+        onclick="selectVision(${lvl}, '${ch.vision1}')">
+        🤖 ${ch.vision1}
+      </button>
+      <button class="w-full p-4 rounded-lg text-left font-bold transition-all"
+        style="background:rgba(255,170,0,0.1);border:2px solid rgba(255,170,0,0.3);color:#ffaa00;"
+        onmouseover="this.style.borderColor='#ffaa00';this.style.background='rgba(255,170,0,0.15';"
+        onmouseout="this.style.borderColor='rgba(255,170,0,0.3)';this.style.background='rgba(255,170,0,0.1';"
+        onclick="selectVision(${lvl}, '${ch.vision2}')">
+        ❤️ ${ch.vision2}
+      </button>
+      <button class="w-full p-4 rounded-lg text-left font-bold transition-all"
+        style="background:rgba(0,170,255,0.1);border:2px solid rgba(0,170,255,0.3);color:#00aaff;"
+        onmouseover="this.style.borderColor='#00aaff';this.style.background='rgba(0,170,255,0.15';"
+        onmouseout="this.style.borderColor='rgba(0,170,255,0.3)';this.style.background='rgba(0,170,255,0.1';"
+        onclick="selectVision(${lvl}, '${ch.vision3}')">
+        🔬 ${ch.vision3}
+      </button>
+      <button class="w-full p-4 rounded-lg text-left font-bold transition-all"
+        style="background:rgba(102,255,170,0.1);border:2px solid rgba(102,255,170,0.3);color:#66ffaa;"
+        onmouseover="this.style.borderColor='#66ffaa';this.style.background='rgba(102,255,170,0.15';"
+        onmouseout="this.style.borderColor='rgba(102,255,170,0.3)';this.style.background='rgba(102,255,170,0.1';"
+        onclick="selectVision(${lvl}, '${ch.vision4}')">
+        🌍 ${ch.vision4}
+      </button>
+    </div>
+    <div id="visionMessage" class="mt-6 p-4 rounded-lg text-center" style="background:rgba(0,255,200,0.08);border:1px solid rgba(0,255,200,0.2);color:#00ffc8;font-size:14px;display:none;"></div>
+  `;
+}
+
+function initFutureVision(ch, lvl) {
+  // No timer for this challenge - it's reflective
+}
+
+function selectVision(lvl, vision) {
+  const msg = document.getElementById('visionMessage');
+  msg.innerHTML = `<p class="font-bold text-base mb-2">✨ رؤيتك للمستقبل:</p><p>${vision}</p><p class="text-xs mt-3" style="color:rgba(0,255,200,0.6);">شكراً لاختيارك! أنت الآن بطل المستقبل!</p>`;
+  msg.style.display = 'block';
+  
+  document.querySelectorAll('button').forEach(b => {
+    b.style.pointerEvents = 'none';
+    b.style.opacity = '0.5';
+  });
+  
+  setTimeout(() => {
+    completeLevel(lvl, 3);
+  }, 2000);
+}
+
+// ===== CELEBRATION =====
+function showCelebration() {
+  const cel = document.getElementById('celebration');
+  cel.classList.add('active');
+  document.getElementById('finalStars').textContent = `النجوم: ${totalStars}/90`;
+  
+  // Particles
+  const colors = ['#00ffc8','#ffd700','#ff4466','#00aaff','#aa66ff'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.bottom = '0';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.setProperty('--dur', (1.5 + Math.random() * 2) + 's');
+    p.style.animationDelay = Math.random() * 1 + 's';
+    cel.appendChild(p);
+  }
+}
+
+// ===== RESET =====
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('resetModal').classList.add('active');
+});
+
+document.getElementById('cancelReset').addEventListener('click', () => {
+  document.getElementById('resetModal').classList.remove('active');
+});
+
+document.getElementById('confirmReset').addEventListener('click', () => {
+  currentLevel = 1;
+  totalStars = 0;
+  levelStars = {};
+  saveProgress();
+  document.getElementById('resetModal').classList.remove('active');
+  document.getElementById('celebration').classList.remove('active');
+  renderMap();
+  showToast('تم إعادة البدء', 'success');
+});
+
+document.getElementById('celebrationRestart').addEventListener('click', () => {
+  currentLevel = 1;
+  totalStars = 0;
+  levelStars = {};
+  saveProgress();
+  document.getElementById('celebration').classList.remove('active');
+  renderMap();
+});
+
+// AUTH LISTENERS
+document.getElementById('authLoginTab').addEventListener('click', () => openAuthModal('login'));
+document.getElementById('authRegisterTab').addEventListener('click', () => openAuthModal('register'));
+document.getElementById('authCancel').addEventListener('click', closeAuthModal);
+document.getElementById('authSubmit').addEventListener('click', () => {
+  if (authMode === 'login') loginUser(); else registerUser();
+});
+document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
+// ===== ELEMENT SDK =====
+try {
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange: async (config) => {
+      const title = config.game_title || defaultConfig.game_title;
+      const company = config.company_name || defaultConfig.company_name;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const font = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+      
+      document.getElementById('gameTitle').textContent = title;
+      document.getElementById('companyName').textContent = company;
+      
+      document.body.style.fontFamily = `${font}, Tajawal, sans-serif`;
+      document.body.style.fontSize = fontSize + 'px';
+      
+      document.getElementById('gameTitle').style.color = primaryColor;
+      document.getElementById('companyName').style.color = primaryColor + '80';
+      document.getElementById('levelDisplay').style.color = primaryColor;
+      document.getElementById('starsDisplay').style.color = secondaryColor;
+    },
+    mapToCapabilities: (config) => ({
+      recolorables: [
+        { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+        { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+        { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+        { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); } },
+        { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); } }
+      ],
+      borderables: [],
+      fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+      fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+    }),
+    mapToEditPanelValues: (config) => new Map([
+      ['game_title', config.game_title || defaultConfig.game_title],
+      ['company_name', config.company_name || defaultConfig.company_name]
+    ])
+  });
+} catch(e) {
+  console.log('SDK not available, continuing without it');
+}
+
+// ===== INIT =====
+createStars();
+initAuth();
+lucide.createIcons();
+
+// ===== DRAG PAN FOR MAP VIEW =====
+let isMapDragging = false;
+const mapView = document.getElementById('mapView');
+if (mapView) {
+  mapView.style.cursor = 'grab';
+  let isDragging = false;
+  let dragged = false;
+  let startX = 0;
+  let startY = 0;
+  let startScrollLeft = 0;
+  let startScrollTop = 0;
+
+  mapView.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    isMapDragging = false;
+    mapView.style.cursor = 'grabbing';
+    startX = e.clientX;
+    startY = e.clientY;
+    startScrollLeft = mapView.scrollLeft;
+    startScrollTop = mapView.scrollTop;
+    mapView.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  mapView.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      isMapDragging = true;
+    }
+    mapView.scrollLeft = startScrollLeft - dx;
+    mapView.scrollTop = startScrollTop - dy;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    isMapDragging = false;
+    mapView.style.cursor = 'grab';
+    mapView.style.userSelect = '';
+  });
+
+  mapView.addEventListener('mouseleave', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    mapView.style.cursor = 'grab';
+    mapView.style.userSelect = '';
+  });
+}
+
+setTimeout(scrollToCurrentLevel, 500);
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9dfdb33556dbbcc7',t:'MTc3NDEwMzkwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html></content>
+<parameter name="filePath">c:\Users\PC\Desktop\The Fuchar\العاب 1\index.html
